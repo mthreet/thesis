@@ -31,11 +31,10 @@
 
 %  The rest of the committee members  must be alphabetized by last name.
 \othermembers{
-Professor Humor Less\\
-Professor Ironic Name\\
-Professor Cirius Thinker\\
+Professor William Hodgkiss\\
+Professor Bhaskar Rao
 }
-\numberofmembers{4} % |chair| + |cochair| + |othermembers|
+\numberofmembers{3} % |chair| + |cochair| + |othermembers|
 
 
 %% START THE FRONTMATTER
@@ -155,7 +154,7 @@ Professor Cirius Thinker\\
 %   The abstract may continue to a second page if necessary.
 %
 \begin{abstract}
-	Source Separation (SS) refers to a problem in signal processing where two or more mixed signal sources must be separated into their individual components. While SS is a challenging problem, it may be simplified by making assumptions on the signals that are present and the methods used to mix the signals. One example of this is to limit the range of signals to human voices and to limit the total number of speakers (through either estimation or always having a set number of speakers). This paper assumes that the speech from two speakers is mixed at one microphone, with the voice of one speaker (Speaker 1) being present in all recordings. Traditional approaches to the SS problem typically involve array processing and time-frequency methods to perform the separation. Once such example is Non-Negative Matrix Factorization (NMF), which attempts to factor a spectrogram into frequency basis vectors and time weights for each speaker. This paper will explore the use of a neural network (NN) to learn effective separation of Speaker 1's voice from a variety of other speakers and background noises. The NN will prove to be much more effective than NMF due to the ability of the NN to learn a representative feature space of Speaker 1's speech.
+	Source Separation (SS) refers to a problem in signal processing where two or more mixed signal sources must be separated into their individual components. While SS is a challenging problem, it may be simplified by making assumptions on the signals that are present and the methods used to mix the signals. One example of this is to limit the range of signals to human voices and to limit the total number of speakers (through either estimation or always having a set number of speakers). This paper assumes that the speech from two speakers is mixed at one microphone, with the voice of one speaker (Speaker 1) being present in all recordings. Traditional approaches to the SS problem typically involve array processing and time-frequency methods to perform the separation. Once such example is Non-Negative Matrix Factorization (NMF), which attempts to factor a spectrogram into frequency basis vectors and time weights for each speaker. This paper will explore the use of a Convolutional Neural Network (CNN) to learn effective separation of Speaker 1's voice from a variety of other speakers and background noises. The CNN will prove to be much more effective than NMF due to the ability of the CNN to learn a representative feature space of Speaker 1's speech.
 \end{abstract}
 
 

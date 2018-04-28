@@ -941,7 +941,7 @@ on microfilm and electronically: }}\\
 
 \newcounter {part}
 \newcounter {chapter}
-\newcounter {section}[chapter]
+\newcounter {section}%[chapter]
 \newcounter {subsection}[section]
 \newcounter {subsubsection}[subsection]
 \newcounter {paragraph}[subsubsection]
@@ -961,8 +961,8 @@ on microfilm and electronically: }}\\
 %
 
 \def\thepart          {\Roman{part}}
-\def\thechapter       {\arabic{chapter}}
-\def\thesection       {\thechapter.\arabic{section}}
+% \def\thechapter       {\arabic{chapter}}
+\def\thesection       {\arabic{section}}%{\thechapter.\arabic{section}}
 \def\thesubsection    {\thesection.\arabic{subsection}}
 \def\thesubsubsection {\thesubsection .\arabic{subsubsection}}
 \def\theparagraph     {\thesubsubsection.\arabic{paragraph}}
@@ -1332,7 +1332,7 @@ on microfilm and electronically: }}\\
   \kern 2.6\p@}                 % The \hrule has default height of .4pt.
 
 % \newcounter{footnote}
-\@addtoreset{footnote}{chapter}  % Numbers footnotes within chapters
+\@addtoreset{footnote}{section}%{chapter}  % Numbers footnotes within chapters
 
 %   \@makefntext{NOTE} :
 %        Must produce the actual footnote, using \@thefnmark as the mark
@@ -1449,8 +1449,8 @@ on microfilm and electronically: }}\\
 
 % FIGURE
 
-\newcounter{figure}[chapter]
-\def\thefigure{\thechapter.\@arabic\c@figure}
+\newcounter{figure}[section]%[chapter]
+\def\thefigure{\thesection.\@arabic\c@figure}%{\thechapter.\@arabic\c@figure}
 
 \def\fps@figure{tbp}
 \def\ftype@figure{1}
@@ -1463,8 +1463,8 @@ on microfilm and electronically: }}\\
 
 % TABLE
 %
-\newcounter{table}[chapter]
-\def\thetable{\thechapter.\@arabic\c@table}
+\newcounter{table}[section]%[chapter]
+\def\thetable{\thesection.\@arabic\c@figure}%{\thechapter.\@arabic\c@table}
 
 \def\fps@table{tbp}
 \def\ftype@table{2}
@@ -1620,7 +1620,7 @@ on microfilm and electronically: }}\\
 %
 % \newcounter{equation}
 %
-\@addtoreset{equation}{chapter}   % Makes \chapter reset 'equation'
+\@addtoreset{equation}{section}%{chapter}   % Makes \chapter reset 'equation'
                                   % counter.
 
 \def\theequation{\thechapter.\arabic{equation}}

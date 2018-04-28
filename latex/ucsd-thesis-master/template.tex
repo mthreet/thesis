@@ -216,18 +216,15 @@
 %
 % Of course, if you prefer, you can just start with
 %   \chapter{My First Chapter Name}
-% and start typing away.  
-\chapter{Just a Test}
-This is only a test.
-\section{A section}
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nulla odio
-sem, bibendum ut, aliquam ac, facilisis id, tellus. Nam posuere pede
-sit amet ipsum. Etiam dolor. In sodales eros quis pede.  Quisque sed
-nulla et ligula vulputate lacinia. In venenatis, ligula id semper
-feugiat, ligula odio adipiscing libero, eget mollis nunc erat id orci.
-Nullam ante dolor, rutrum eget, vestibulum euismod, pulvinar at, nibh.
-In sapien. Quisque ut arcu. Suspendisse potenti. Cras consequat cursus
-nulla.
+% and start typing away. 
+\section{Introduction}
+\label{sec:intro}
+General Source Separation (SS) is difficult, but with assumptions made on the present signals and their mixing methods, it becomes a much more tractable problem. In this paper, assumptions were made that all signals were a mixture of two human voices at a single microphone, and that the voice of  a certain speaker (Speaker 1) was present in every signal. The proposed solution is a Convolutional Neural Network (CNN) that is trained to separate Speaker 1's voice from the raw audio mixture recorded at the microphone. By keeping Speaker 1's voice constant through all training steps, the CNN will learn the underlying features of Speaker 1's voice and will be able to separate Speaker 1's voice from a variety of other voices. While many SS algorithms use time-frequency processing to acquire a better relationship of the mixed signals, this CNN method is more unique in its ability to take raw audio as an input and return the separated raw audio as an output. Non-Negative Matrix Factorization (NMF) for example, factors the spectrogram of the mixed signals into matrices whose columns and rows correspond to the time-frequency and activity components of each signal present.
+\section{Background}
+\subsection{The Dataset}
+\subsection{Convolutional Neural Networks}
+\subsection{Non-Negative Matrix Factorization}
+
 
 \subsection{A Figure Example}
 \label{ssec:figure_example}
@@ -281,9 +278,6 @@ noon & medium & Croutons (Tomato Basil Soup \& Granny Smith Chicken Salad) \\
 
 %% APPENDIX
 \appendix
-\chapter{Final notes}
-What to do about things \cite{Martin_1983}.  What did he say \cite{Rilling_Insel_1999}.
-  Remove me in case of abdominal pain.
 
 
 

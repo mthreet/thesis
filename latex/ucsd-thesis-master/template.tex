@@ -191,7 +191,7 @@
 \usepackage{booktabs}  % Enables \toprule  http://ctan.org/pkg/array
 
 
-
+\usepackage{url}
 \begin{document}
 
 %% FRONT MATTER
@@ -217,14 +217,51 @@
 % Of course, if you prefer, you can just start with
 %   \chapter{My First Chapter Name}
 % and start typing away. 
+
+
 \section{Introduction}
 \label{sec:intro}
-General Source Separation (SS) is difficult, but with assumptions made on the present signals and their mixing methods, it becomes a much more tractable problem. In this paper, assumptions were made that all signals were a mixture of two human voices at a single microphone, and that the voice of  a certain speaker (Speaker 1) was present in every signal. The proposed solution is a Convolutional Neural Network (CNN) that is trained to separate Speaker 1's voice from the raw audio mixture recorded at the microphone. By keeping Speaker 1's voice constant through all training steps, the CNN will learn the underlying features of Speaker 1's voice and will be able to separate Speaker 1's voice from a variety of other voices. While many SS algorithms use time-frequency processing to acquire a better relationship of the mixed signals, this CNN method is more unique in its ability to take raw audio as an input and return the separated raw audio as an output. Non-Negative Matrix Factorization (NMF) for example, factors the spectrogram of the mixed signals into matrices whose columns and rows correspond to the time-frequency and activity components of each signal present.
-\section{Background}
-\subsection{The Dataset}
-\subsection{Convolutional Neural Networks}
-\subsection{Non-Negative Matrix Factorization}
+General Source Separation (SS) is difficult, but with assumptions made on the signals that are present and their mixing methods, it becomes a much more tractable problem. In this paper, assumptions were made that all signals were a mixture of two human voices at a single microphone, and that the voice of  a certain speaker (Speaker 1) was present in every signal. The proposed solution is a Convolutional Neural Network (CNN) that is trained to separate Speaker 1's voice from the raw audio mixture recorded at the microphone. By keeping Speaker 1's voice constant through all training steps, the CNN will learn the underlying features of Speaker 1's voice and will be able to separate Speaker 1's voice from a variety of other voices. While many SS algorithms use time-frequency processing to acquire a better relationship of the mixed signals, this CNN method is more unique in its ability to take raw audio as an input and return the separated raw audio as an output. Non-Negative Matrix Factorization (NMF) for example, factors the spectrogram of the mixed signals into matrices whose columns and rows correspond to the time-frequency and activity components of each signal present.
 
+
+\section{Background}
+\subsection{The Dataset and Evaluation}
+The dataset used in this paper was borrowed from the Language and Speech Lab's 1\textsuperscript{st} Speech Separation Challenge \cite{laslab}. The dataset consists of a 34 individual speakers uttering short sentences, along with combinations of these speakers' voices in a variety of patterns. This paper focused solely on separating Speaker 1's voice from a number of different  speakers. The dataset provided both a mixed version and a clean version of Speaker 1's voice for each example, which allowed for the quality of reconstruction to be measured. 
+
+The dataset provided the mixtures at varying Signal-to-Noise Ratios (SNRs), but this paper only considered the mixtures with a \mbox{0 dB} SNR. All reconstructions of Speaker 1's voice were evaluated on the Mean Squared Error (MSE) between the separated voice and the original voice.
+
+\subsection{Non-Negative Matrix Factorization}
+Non-negative Matrix Factorization attempts to factor an $n \times m$ matrix $A$ with all $A_{ij} \geq 0$ into two matrices: $W$, an $n \times k$ matrix and $H$, a $k \times m$ matrix. For speech separation, $A$ is the magnitude of the spectrogram of the mixed signals and $k$ is the estimated number of speakers. For this paper, the assumption was made that $k=2$ in all cases. Since $A$ is a magnitude spectrogram, it satisfies the condition that $A_{ij} \geq 0$. For a given spectrogram magnitude $A$, $n$ is the number of Discrete Fourier Transform (DFT) frequency bins, and $k$ is the number of discrete time steps that the DFT was taken at.
+
+The objective of NMF is to minimize the Frobenius Norm between the original matrix $A$ and the reconstructed matrix $WH$ (i.e. $\| A - WH\|_2$). The Frobenius norm is defined as:
+
+\begin{equation}
+\| Q \|_2 = \sqrt{\sum\limits_{i} \sum\limits_{j} Q_{ij}^2}
+\end{equation}
+
+Given the objective function, it is possible to solve for $W$ and $H$ iteratively with the following multiplicative update equations and random initializations for $W$ and $H$ \cite{Lee00algorithmsfor}:
+
+\begin{equation}
+W \leftarrow W \circ \frac{AH'}{WHH'}
+\end{equation}
+\begin{equation}
+H \leftarrow H \circ \frac{W'A}{W'WH'}
+\end{equation}
+
+where $A \circ B$ and $\frac{A}{B}$ represent elementwise multiplication and division respectively. With enough iterations, the Frobenius objective should converge to within a small threshold.
+
+NMF is useful due to its simple iterative implementation and because spectrogram magnitude matrices by definition satisfy the non-negative condition.  Additionally, the matrices $W$ and $H$ have useful signal interpretations. The columns of $W$ form $k$ frequency basis vectors for the spectrogram $A$, while the rows of $H$ act as time-varying activations for the frequency bases in $W$. The spectrograms of the $k$ independent signals are then estimated as:
+
+\begin{equation}
+X_i = W_{:i}H_{i:}, i=1,...,k
+\end{equation}
+
+where $W_{:i} $represents the the $i^{th}$ column of $W$, and $H_{i:} $represents the the $i^{th}$ row of $H$. In essence, each source is approximated as a basis spectrogram $X_i$ for the total spectrogram $A$. The original time-series speech signals are then recovered by multiplying each of the individual magnitude spectrograms $X_i$ with the phase of the spectrogram corresponding to $A$, and finding the inverse of the complex-valued spectrogram.
+
+\subsection{Convolutional Neural Networks}
+Convolutional Neural Networks generally use a combination of convolution, activation, and pooling layers to estimate a desired output signal given an input signal. CNNs will essentially learn a mapping from an input signal to an output signal, which for this paper were the mixed signal containing Speaker 1's voice and another voice and Speaker 1's voice, respectively. The benefit of a CNN is that the weights of all the convolutional filters do not need to be hand-designed. Instead, they are learned iteratively during a training process.
+
+A convolutional layer consists of a collection of filter kernels, each with their own adjustable/learnable weights. 
 
 \subsection{A Figure Example}
 \label{ssec:figure_example}

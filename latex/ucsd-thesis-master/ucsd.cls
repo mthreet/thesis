@@ -1620,10 +1620,10 @@ on microfilm and electronically: }}\\
 %
 % \newcounter{equation}
 %
-\@addtoreset{equation}{section}%{chapter}   % Makes \chapter reset 'equation'
+% \@addtoreset{equation}{section}%{chapter}   % Makes \chapter reset 'equation'
                                   % counter.
 
-\def\theequation{\thechapter.\arabic{equation}}
+\def\theequation{\arabic{equation}}%{\thechapter.\arabic{equation}}
 
 % \jot = 3pt      % Extra space added between lines of an eqnarray
                   % environment

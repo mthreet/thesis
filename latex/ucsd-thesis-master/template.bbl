@@ -1,14 +1,13 @@
-\begin{thebibliography}{Mar83}
+\begin{thebibliography}{LS00}
 
-\bibitem[Mar83]{Martin_1983}
-Robert~D. Martin.
-\newblock {\em Human Brain Evolution in an Ecological Context}.
-\newblock American Museum of Natural History, 1983.
+\bibitem[las06]{laslab}
+Ikerbasque and university of the basque country language and speech lab's
+  1\textsuperscript{st} speech separation challenge.
+\newblock \url{http://laslab.org/SpeechSeparationChallenge/}, 2006.
 
-\bibitem[RI99]{Rilling_Insel_1999}
-James~K. Rilling and Thomas~R. Insel.
-\newblock The primate neocortex in comparative perspective using magnetic
-  resonance imaging.
-\newblock {\em Journal of Human Evolution}, 37(2):191--223, 1999.
+\bibitem[LS00]{Lee00algorithmsfor}
+Daniel~D. Lee and H.~Sebastian Seung.
+\newblock Algorithms for non-negative matrix factorization.
+\newblock In {\em In NIPS}, pages 556--562. MIT Press, 2000.
 
 \end{thebibliography}

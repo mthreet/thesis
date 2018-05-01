@@ -2,10 +2,11 @@ import os
 import numpy as np
 from utils import load_dataset
 import argparse
+import pdb
 
 
 def main(args):
-
+    from keras.utils import plot_model
     # The directory containing wav files
     in_dir = '/home/mthret/class/thesis/data/mf'
     sr = 16000
@@ -19,6 +20,8 @@ def main(args):
     x, y = prep_data(wav_data, seg_len)
 
     conv_model = FullConvSep(x.shape[1:])
+    plot_model(conv_model, 'model.png', show_shapes=True,
+        show_layer_names=False)
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)

@@ -259,9 +259,41 @@ X_i = W_{:i}H_{i:}, i=1,...,k
 where $W_{:i} $represents the the $i^{th}$ column of $W$, and $H_{i:} $represents the the $i^{th}$ row of $H$. In essence, each source is approximated as a basis spectrogram $X_i$ for the total spectrogram $A$. The original time-series speech signals are then recovered by multiplying each of the individual magnitude spectrograms $X_i$ with the phase of the spectrogram corresponding to $A$, and finding the inverse of the complex-valued spectrogram.
 
 \subsection{Convolutional Neural Networks}
-Convolutional Neural Networks generally use a combination of convolution, activation, and pooling layers to estimate a desired output signal given an input signal. CNNs will essentially learn a mapping from an input signal to an output signal, which for this paper were the mixed signal containing Speaker 1's voice and another voice and Speaker 1's voice, respectively. The benefit of a CNN is that the weights of all the convolutional filters do not need to be hand-designed. Instead, they are learned iteratively during a training process.
+Convolutional Neural Networks generally use a combination of convolution, activation, and pooling layers to estimate a desired output signal given an input signal. CNNs will essentially learn a mapping from an input signal to an output signal, which for this paper were the mixed signal containing Speaker 1's voice and another voice and Speaker 1's voice, respectively. The benefit of a CNN is that the weights of all the convolutional filters do not need to be hand-designed. Instead, they are learned iteratively during a training process. Figure \ref{fig:cnn_model} shows the CNN used in this paper.
 
-A convolutional layer consists of a collection of filter kernels, each with their own adjustable/learnable weights. 
+\begin{figure}[h] 
+  \centering
+  \includegraphics[width=0.25\textwidth]{pics/model}
+  \caption[The CNN model and its layers]
+{The CNN model with its layers. The graph shows the input and output size of each layer, along with the layer name/type.}
+  \label{fig:cnn_model}
+\end{figure}
+
+A convolutional layer consists of a collection of filter kernels, each with their own adjustable/learnable weights. For example, the first convolutional layer in Figure \ref{fig:cnn_model}, contains 128 filter kernels, each of which is convolved with the input signal of length 2048. This in turn gives the first convolutional layer 128 outputs, each of length 2048.
+
+Although not listed in Figure \ref{fig:cnn_model}, each convolutional layer is followed by an activation layer. These activations apply non-linear functions to the convolutional layer outputs, which allow for greater feature learning by the network. If no non-linearities were applied, the CNN could be viewed as a linear system, which would decrease the effectiveness of adding additional layers. For this paper, hyperbolic tangent non-linearities were used after each convolutional layer, except for the last layer, which had a linear activation applied (so that the output signal can take on a more linear range of values).
+
+The pooling layers downsample the signals passing through the CNN. The model in Figure \ref{fig:cnn_model} has max-pooling layers and a downsampling rate of 2, which translates to only the maximum value between pairs of consecutive samples remaining. Ideally, the convolutional layers will amplify the samples related to Speaker 1's voice, and max-pooling will retain only those samples.
+
+The upsampling layers serve to undo the effects of the downsampling layers, so that the output signal has the same length as the input signal. The upsampling layers learn upsampling filters that best reconstruct Speaker 1's voice given the previous layers' outputs.
+
+The loss used in the CNN was a combination of the MSE between the CNN output and Speaker 1's true speech signal, and the MSE between the DFTs of the CNN output and Speaker 1's true speech signal. This allowed for both the time and frequency components of the reconstructed speech signal to be evaluated, while still making the network loss easy to compute.
+
+The true power of a CNN is that, given an output error, the best updates to the filter weights in the network can be computed through backpropagation. Each layer in the CNN will is used to compute the output of the network, so the partial derivatives of each layer with respect to each other and the output can be computed. In this sense, the error at the output can be propagated backwards through the CNN to update the filter weights at each layer.
+
+
+\section{Methods and Technical Approach}
+All experimentation in this paper was done with Python 3.6. Python's librosa library was used for all audio processing, as it provides nice tools for loading, manipulating, and saving audio files.
+
+\subsection{NMF}
+The NMF algorithm used in this paper was always used with no initializations for $W$ and $H$, a Frobenius norm objective, a maximum of 200 iterations, and with the number of components always set to two. The input audio signal was comprised of 32000 samples, and the spectrogram was computed using a segment size of 512, a DFT length of 512, an overlap of 128, and Kaiser window with $\beta = 14$.
+
+The magnitude and phase of the resulting spectrogram were taken, and NMF was applied to the spectrogram magnitude with the parameters mentioned above. The resulting separated spectrogram magnitudes were then computed using the output of NMF, and the separated audio signals were obtained by taking the inverse spectrograms of the spectrogram magnitudes multiplied by the original spectrogram's phase.
+
+The MSE between the estimate of Speaker 1's separated speech and Speaker 1's actual speech was then taken and recorded as the metric for reconstruction.
+
+\subsection{CNN}
+The architecture of the CNN in this paper is shown in Figure \ref{fig:cnn_model}. The filters in all convolutional layers had a kernel size of 16 and hyperbolic tangent activations applied, except for the final convolutional layer, which had a no activation (i.e. a linear activation) applied. Unlike the NMF processing, the input to the CNN was cut into segments of length 128, with no windowing applied. The CNN was trained on 2,000 example files, each with 32,000 samples. After training, the CNN was evaluated on 500 separate example files, each with 32,000 samples. The evaluation files were chosen randomly from the whole dataset so that a representative portion was obtained.
 
 \subsection{A Figure Example}
 \label{ssec:figure_example}

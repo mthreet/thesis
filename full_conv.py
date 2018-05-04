@@ -11,7 +11,7 @@ def main(args):
     in_dir = '/home/mthret/class/thesis/data/mf'
     sr = 16000
     speaker_ids = ['8', '16']
-    num_wavs = 2
+    num_wavs = 50
     num_speakers = 2
     num_samples = 32000
     seg_len = 2048
@@ -142,24 +142,21 @@ def test_FullConvSep(model, data, args, fs):
     wavwrite(os.path.join(wav_dir, 'sep_sig.wav'), x_recon.flatten(), 44100)
     wavwrite(os.path.join(wav_dir, 'true_sig.wav'), y_test_sig.flatten(),
                  44100)
-    for i in range(100):
+    for i in range(x_test.shape[0]):
         # wavwrite(os.path.join(wav_dir, 'comb_sig_' + str(i) + '.wav'),
         #          x_test[i], fs)
         # wavwrite(os.path.join(wav_dir, 'sep_sig_' + str(i) + '.wav'),
         #          x_recon[i], fs)
         plt.figure()
-        plt.subplot(4, 1, 1)
-        plt.title('Input Signal')
+        plt.subplot(3, 1, 1)
+        plt.title('Mixed Signal')
         plt.plot(x_test[i])
-        plt.subplot(4, 1, 2)
-        plt.title('Desired Signal')
+        plt.subplot(3, 1, 2)
+        plt.title('Speaker 1')
         plt.plot(y_test_sig[i])
-        plt.subplot(4, 1, 3)
+        plt.subplot(3, 1, 3)
         plt.title('Reconstructed Signal')
         plt.plot(x_recon[i])
-        plt.subplot(4, 1, 4)
-        plt.title('Residual')
-        plt.plot(residual[i])
         plt.tight_layout()
         plt.savefig(os.path.join(img_dir, 'test_' + str(i) + '.png'))
         plt.close()

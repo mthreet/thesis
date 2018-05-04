@@ -113,6 +113,7 @@
 \usepackage{scrextend}
 \usepackage{pslatex}
 \usepackage{graphicx}
+\usepackage{subfig}
 
 %% CAPTION
 % This overrides some of the ugliness in ucsd.cls and
@@ -228,7 +229,7 @@ General Source Separation (SS) is difficult, but with assumptions made on the si
 \subsection{The Dataset and Evaluation}
 The dataset used in this paper was borrowed from the Language and Speech Lab's 1\textsuperscript{st} Speech Separation Challenge \cite{laslab}. The dataset consists of a 34 individual speakers uttering short sentences, along with combinations of these speakers' voices in a variety of patterns. This paper focused solely on separating Speaker 1's voice from a number of different  speakers. The dataset provided both a mixed version and a clean version of Speaker 1's voice for each example, which allowed for the quality of reconstruction to be measured. 
 
-The dataset provided the mixtures at varying Signal-to-Noise Ratios (SNRs), but this paper only considered the mixtures with a \mbox{0 dB} SNR. All reconstructions of Speaker 1's voice were evaluated on the Mean Squared Error (MSE) between the separated voice and the original voice.
+The dataset provided the mixtures at varying Signal-to-Noise Ratios (SNRs), and this paper used the whole range. All reconstructions of Speaker 1's voice were evaluated on the Root Mean Squared Error (RMSE) between the separated voice and the original voice.
 
 \subsection{Non-Negative Matrix Factorization}
 Non-negative Matrix Factorization attempts to factor an $n \times m$ matrix $A$ with all $A_{ij} \geq 0$ into two matrices: $W$, an $n \times k$ matrix and $H$, a $k \times m$ matrix. For speech separation, $A$ is the magnitude of the spectrogram of the mixed signals and $k$ is the estimated number of speakers. For this paper, the assumption was made that $k=2$ in all cases. Since $A$ is a magnitude spectrogram, it satisfies the condition that $A_{ij} \geq 0$. For a given spectrogram magnitude $A$, $n$ is the number of Discrete Fourier Transform (DFT) frequency bins, and $k$ is the number of discrete time steps that the DFT was taken at.
@@ -277,12 +278,12 @@ The pooling layers downsample the signals passing through the CNN. The model in 
 
 The upsampling layers serve to undo the effects of the downsampling layers, so that the output signal has the same length as the input signal. The upsampling layers learn upsampling filters that best reconstruct Speaker 1's voice given the previous layers' outputs.
 
-The loss used in the CNN was a combination of the MSE between the CNN output and Speaker 1's true speech signal, and the MSE between the DFTs of the CNN output and Speaker 1's true speech signal. This allowed for both the time and frequency components of the reconstructed speech signal to be evaluated, while still making the network loss easy to compute.
+The loss used in the CNN was a combination of the RMSE between the CNN output and Speaker 1's true speech signal, and the RMSE between the DFTs of the CNN output and Speaker 1's true speech signal. This allowed for both the time and frequency components of the reconstructed speech signal to be evaluated, while still making the network loss easy to compute.
 
 The true power of a CNN is that, given an output error, the best updates to the filter weights in the network can be computed through backpropagation. Each layer in the CNN will is used to compute the output of the network, so the partial derivatives of each layer with respect to each other and the output can be computed. In this sense, the error at the output can be propagated backwards through the CNN to update the filter weights at each layer.
 
 
-\section{Methods and Technical Approach}
+\section{Technical Approach and Results}
 All experimentation in this paper was done with Python 3.6. Python's librosa library was used for all audio processing, as it provides nice tools for loading, manipulating, and saving audio files.
 
 \subsection{NMF}
@@ -290,58 +291,83 @@ The NMF algorithm used in this paper was always used with no initializations for
 
 The magnitude and phase of the resulting spectrogram were taken, and NMF was applied to the spectrogram magnitude with the parameters mentioned above. The resulting separated spectrogram magnitudes were then computed using the output of NMF, and the separated audio signals were obtained by taking the inverse spectrograms of the spectrogram magnitudes multiplied by the original spectrogram's phase.
 
-The MSE between the estimate of Speaker 1's separated speech and Speaker 1's actual speech was then taken and recorded as the metric for reconstruction.
+The RMSE between the estimate of Speaker 1's separated speech and Speaker 1's actual speech was then taken and recorded as the metric for reconstruction.
 
 \subsection{CNN}
 The architecture of the CNN in this paper is shown in Figure \ref{fig:cnn_model}. The filters in all convolutional layers had a kernel size of 16 and hyperbolic tangent activations applied, except for the final convolutional layer, which had a no activation (i.e. a linear activation) applied. Unlike the NMF processing, the input to the CNN was cut into segments of length 128, with no windowing applied. The CNN was trained on 2,000 example files, each with 32,000 samples. After training, the CNN was evaluated on 500 separate example files, each with 32,000 samples. The evaluation files were chosen randomly from the whole dataset so that a representative portion was obtained.
 
-\subsection{A Figure Example}
-\label{ssec:figure_example}
 
-This subsection shows a sample figure.
+\subsection{Results}
+Table \ref{table:results} shows a summary of the results  for NMF and the CNN. Note that all signals were normalized so that maximum value was one before the RMSE was taken.
 
-\begin{figure}[h] 
-  \centering
-  \includegraphics[width=0.5\textwidth]{sandiego}
-  \caption[A picture of San Diego. Short figure caption must be \protect{$< 4$} lines in the list of figures]
-{A picture of San Diego.  Short figure caption must be \protect{$< 4$} lines in the list of figures and match the start of the main figure caption verbatim. Note that figures must be on their own line (no neighboring text) and captions must be single-spaced and appear \protect\textit{below} the figure.  Captions can be as long as you want, but if they are longer than 4 lines in the list of figures, you must provide a short figure caption.\index{SanDiego}}
-  \label{fig:sandiego}
-\end{figure}
-
-\subsection{A Table Example}
-
-While in Section \ref{ssec:figure_example} Figure \ref{fig:sandiego} we had a majestic figure, here we provide a crazy table example.
-
-
-%%%% TABLE 1 %%%%
 \vspace{0.25in}
 \begin{table}[!ht]
-\caption[A table of when I get hungry.  Short table caption must be \protect{$< 4$} lines in the list of tables]{A table of when I get hungry. Short table caption must be \protect{$< 4$} lines in the list of tables and match the start of the main table caption verbatim.  Note that tables must be on their own line (no neighboring text) and captions must be single-spaced and appear \protect\textit{above} the table.  Captions can be as long as you want, but if they are longer than 4 lines in the list of figures, you must provide a short figure caption.}
+\caption{Summary of reconstruction results (given in RMSE) at a variety of SNRs}
 
 \vspace{-0.25in}
 \begin{center}
-\begin{tabular}{|p{1in}|p{2in}|p{3in}|}
+\begin{tabular}{| c | c | c |  c | c | c |}
 
 \hline
-Time of day & Hunger Level & Preferred Food \\
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
 
 \hline
-8am & high & IHOP (French Toast) \\
+NMF & 0.15 & 0.12 & 0.10 & 0.08 & 0.04 \\
 
 \hline
-noon & medium & Croutons (Tomato Basil Soup \& Granny Smith Chicken Salad) \\
-
-\hline
-5pm & high & Bombay Coast (Saag Paneer) or Hi Thai (Pad See Ew) \\
-
-\hline
-8pm & medium & Yogurt World (froyo!) \\
+CNN & 0.13 & 0.09 & 0.06 & 0.03 & 0.01 \\
 
 \hline
 \end{tabular}
 \end{center}
-\label{tab:analysis3}
+\label{table:results}
 \end{table}
+
+
+\section{Conclusion}
+As seen in Table \ref{table:results}, the CNN performs better at all SNRs. Both the NMF algorithm and the CNN perform better as the SNR increases, which makes sense due to both methods having to do less work to transform the input mixed signal into the separated signal. While Table \ref{table:results} shows that the two methods are not too far off in their reconstruction errors, the graphical results reveal a different result.
+
+Figure \ref{fig:sim_res} shows a reconstruction example where both NMF and the CNN perform decently well at reconstruction. While neither method is perfect, and both methods tend to look more like the mixed signal in areas of uncertainty, the output is generally smooth and natural.
+
+\begin{figure}[h]
+    \begin{minipage}{.5\linewidth}
+        \centering
+        \subfloat[]{\label{main:a}\includegraphics[scale=.45]{pics/nnmf1}}
+    \end{minipage}%
+    \begin{minipage}{.5\linewidth}
+        \centering
+        \subfloat[]{\label{main:b}\includegraphics[scale=.45]{pics/cnn1}}
+    \end{minipage}
+    \caption{ a) The results using NMF b) The results using the CNN}
+    \label{fig:sim_res}
+\end{figure}
+
+A more typical reconstruction example is shown in Figure \ref{fig:diff_res}. In most cases, NMF was not able to effectively reconstruct Speaker 1's voice in a realistic manner, even when the mixed signal was comprised mainly of only Speaker 1's voice. The CNN, on the other hand, was actually able to perform a small amount of denoising at the end of mixed signal.
+
+\begin{figure}[h]
+    \begin{minipage}{.5\linewidth}
+        \centering
+        \subfloat[]{\label{main:a}\includegraphics[scale=.45]{pics/nnmf2}}
+    \end{minipage}%
+    \begin{minipage}{.5\linewidth}
+        \centering
+        \subfloat[]{\label{main:b}\includegraphics[scale=.45]{pics/cnn2}}
+    \end{minipage}
+    \caption{ a) The results using NMF b) The results using the CNN}
+    \label{fig:diff_res}
+\end{figure}
+
+In general, the CNN produced much smoother and more realistic results. The CNN has three advantages over NMF: it can use nonlinear methods, it can use a variety of loss functions, and it can use a large amount of training examples to learn more robust reconstructions.
+
+The CNN applies nonlinear activations after each convolutional layer, which allows for nonlinear approximations to be made. Conversely, NMF relies on a linear matrix factorization, which places limitations on the reconstruction quality of Speaker 1's voice.
+
+The CNN loss function for this experiment was a combination of the difference in the reconstruction and Speaker 1's original speech in both the time and frequency domains. This allows for better phase reconstruction in the reconstructed signal. NMF, meanwhile, is only able to use the spectrograms of the original and reconstructed speech signals, which ignores any phase information, and does not consider time-domain accuracy.
+
+Finally, the CNN is able to use the thousands of past examples it has seen to influence the reconstruction of future signals. The CNN can learn 
+common patterns or features in Speaker 1's voice and reconstruct them more easily as training time increases. NMF, on the other hand, does not keep track of any past examples, so only the current input is weighted for consideration. In other words, NMF cannot learn any patterns or features of Speaker 1's voice.
+
+
+
 
 
 

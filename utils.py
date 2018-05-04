@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 from scipy.signal import kaiser
 from sklearn.decomposition import FastICA
+import pdb
 
 
 def load_dataset(in_dir, sr, speaker_ids, num_wavs, num_speakers, num_samples):
@@ -119,36 +120,32 @@ def spect_to_audio(recon_spects, n_fft, hop_length):
     return recon_wavs
 
 
-def plot_orig_vs_recon(wav_data, recon_wavs, num_plots):
+def plot_orig_vs_recon(wav_data, recon_wavs, save_dir):
     num_sigs = wav_data.shape[1]
-    for i in range(num_plots):
-        plt.figure(i + 1)
-        for j in range(num_sigs - 1):
-            plt.subplot(num_sigs, 2, 2*j+1)
-            plt.plot(wav_data[i, j])
-            plt.ylim([-1, 1])
-            plt.title('Original Signal {}'.format(j+1))
-            plt.xlabel('Sample Index')
-            plt.ylabel('Amplitude')
-            plt.subplot(num_sigs, 2, 2*j+2)
-            plt.plot(recon_wavs[i, j])
-            plt.ylim([-1, 1])
-            plt.title('Reconstructed Signal {}'.format(j+1))
-            plt.xlabel('Sample Index')
-            plt.ylabel('Amplitude')
-        plt.subplot(num_sigs, 2, 2*num_sigs-1)
-        plt.plot(wav_data[i, -1])
-        plt.ylim([-1, 1])
-        plt.title('Original Combined Signals')
-        plt.xlabel('Sample Index')
-        plt.ylabel('Amplitude')
-        plt.subplot(num_sigs, 2, 2*num_sigs)
-        plt.plot(np.sum(recon_wavs[i,:-1, :], axis=0))
-        plt.ylim([-1, 1])
-        plt.title('Reconstructed Combined Signals')
-        plt.xlabel('Sample Index')
-        plt.ylabel('Amplitude')
-        plt.tight_layout()
+    wav_data = np.array(np.array_split(wav_data,
+        np.arange(2048,31999,2048), axis=-1)[:-1])
+    recon_wavs = np.array(np.array_split(recon_wavs,
+        np.arange(2048,31999,2048), axis=-1)[:-1])
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir)
+
+    img_idx = 0
+    for j in range(wav_data.shape[1]):
+        for i in range(wav_data.shape[0]):
+            plt.figure()
+            plt.subplot(3, 1, 1)
+            plt.title('Mixed Signal')
+            plt.plot(wav_data[i, j, -1])
+            plt.subplot(3, 1, 2)
+            plt.title('Speaker 1')
+            plt.plot(wav_data[i, j, 0])
+            plt.subplot(3, 1, 3)
+            plt.title('Reconstructed Signal')
+            plt.plot(recon_wavs[i, j, 0])
+            plt.tight_layout()
+            plt.savefig(os.path.join(save_dir, 'test_'+ str(img_idx)+'.png'))
+            plt.close()
+            img_idx += 1
     plt.show()
 
 

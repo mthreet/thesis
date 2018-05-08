@@ -232,9 +232,9 @@ The dataset used in this paper was borrowed from the Language and Speech Lab's 1
 The dataset provided the mixtures at varying Signal-to-Noise Ratios (SNRs), and this paper used the whole range. All reconstructions of Speaker 1's voice were evaluated on the Root Mean Squared Error (RMSE) between the separated voice and the original voice.
 
 \subsection{Non-Negative Matrix Factorization}
-Non-negative Matrix Factorization attempts to factor an $n \times m$ matrix $A$ with all $A_{ij} \geq 0$ into two matrices: $W$, an $n \times k$ matrix and $H$, a $k \times m$ matrix. For speech separation, $A$ is the magnitude of the spectrogram of the mixed signals and $k$ is the estimated number of speakers. For this paper, the assumption was made that $k=2$ in all cases. Since $A$ is a magnitude spectrogram, it satisfies the condition that $A_{ij} \geq 0$. For a given spectrogram magnitude $A$, $n$ is the number of Discrete Fourier Transform (DFT) frequency bins, and $k$ is the number of discrete time steps that the DFT was taken at.
+Non-negative Matrix Factorization attempts to factor an $n \times m$ matrix $A$ with all $A_{ij} \geq 0$ into two matrices: $W$, an $n \times k$ matrix and $H$, a $k \times m$ matrix. For speech separation, $A$ is the magnitude of the spectrogram of the mixed signals and $k$ is the estimated number of speakers. For this paper, it is given that $k=2$ in all cases, due to the nature of the dataset. Since $A$ is a magnitude spectrogram, it satisfies the condition that $A_{ij} \geq 0$. For a given spectrogram magnitude $A$, $n$ is the number of Discrete Fourier Transform (DFT) frequency bins, and $m$ is the number of discrete time steps that the DFT was taken at.
 
-The objective of NMF is to minimize the Frobenius Norm between the original matrix $A$ and the reconstructed matrix $WH$ (i.e. $\| A - WH\|_2$). The Frobenius norm is defined as:
+The objective of NMF is to minimize the Frobenius Norm between the original matrix $A$ and the reconstructed matrix $WH$ (i.e. $\| A - WH\|_2$). The Frobenius norm for any $n \times m$ matrix $Q$ is defined as:
 
 \begin{equation}
 \| Q \|_2 = \sqrt{\sum\limits_{i} \sum\limits_{j} Q_{ij}^2}
@@ -249,7 +249,7 @@ W \leftarrow W \circ \frac{AH'}{WHH'}
 H \leftarrow H \circ \frac{W'A}{W'WH'}
 \end{equation}
 
-where $A \circ B$ and $\frac{A}{B}$ represent elementwise multiplication and division respectively. With enough iterations, the Frobenius objective should converge to within a small threshold.
+where $A \circ B$ and $\frac{A}{B}$ represent elementwise multiplication and division respectively. With enough iterations, the Frobenius objective should converge to within a small threshold (with both the number of iterations and the threshold being tuneable hyperparameters).
 
 NMF is useful due to its simple iterative implementation and because spectrogram magnitude matrices by definition satisfy the non-negative condition.  Additionally, the matrices $W$ and $H$ have useful signal interpretations. The columns of $W$ form $k$ frequency basis vectors for the spectrogram $A$, while the rows of $H$ act as time-varying activations for the frequency bases in $W$. The spectrograms of the $k$ independent signals are then estimated as:
 
@@ -260,7 +260,7 @@ X_i = W_{:i}H_{i:}, i=1,...,k
 where $W_{:i} $represents the the $i^{th}$ column of $W$, and $H_{i:} $represents the the $i^{th}$ row of $H$. In essence, each source is approximated as a basis spectrogram $X_i$ for the total spectrogram $A$. The original time-series speech signals are then recovered by multiplying each of the individual magnitude spectrograms $X_i$ with the phase of the spectrogram corresponding to $A$, and finding the inverse of the complex-valued spectrogram.
 
 \subsection{Convolutional Neural Networks}
-Convolutional Neural Networks generally use a combination of convolution, activation, and pooling layers to estimate a desired output signal given an input signal. CNNs will essentially learn a mapping from an input signal to an output signal, which for this paper were the mixed signal containing Speaker 1's voice and another voice and Speaker 1's voice, respectively. The benefit of a CNN is that the weights of all the convolutional filters do not need to be hand-designed. Instead, they are learned iteratively during a training process. Figure \ref{fig:cnn_model} shows the CNN used in this paper.
+Convolutional Neural Networks generally use a combination of convolution, activation, and pooling layers to estimate a desired output signal given an input signal. CNNs will essentially learn a mapping from an input signal to an output signal, which for this paper were the mixed signal containing Speaker 1's voice and another voice, and Speaker 1's isolated voice, respectively. The benefit of a CNN is that the weights of all the convolutional filters do not need to be hand-designed. Instead, they are learned iteratively during a training process. Figure \ref{fig:cnn_model} shows the CNN used in this paper.
 
 \begin{figure}[h] 
   \centering
@@ -272,19 +272,19 @@ Convolutional Neural Networks generally use a combination of convolution, activa
 
 A convolutional layer consists of a collection of filter kernels, each with their own adjustable/learnable weights. For example, the first convolutional layer in Figure \ref{fig:cnn_model}, contains 128 filter kernels, each of which is convolved with the input signal of length 2048. This in turn gives the first convolutional layer 128 outputs, each of length 2048.
 
-Although not listed in Figure \ref{fig:cnn_model}, each convolutional layer is followed by an activation layer. These activations apply non-linear functions to the convolutional layer outputs, which allow for greater feature learning by the network. If no non-linearities were applied, the CNN could be viewed as a linear system, which would decrease the effectiveness of adding additional layers. For this paper, hyperbolic tangent non-linearities were used after each convolutional layer, except for the last layer, which had a linear activation applied (so that the output signal can take on a more linear range of values).
+Although not listed in Figure \ref{fig:cnn_model}, each convolutional layer is followed by an activation layer. These activations apply non-linear functions to the convolutional layer outputs, which allow for greater feature learning by the network. sIn an absence of non-linearities], the CNN could be viewed as a linear system, which would decrease the effectiveness of adding additional layers (i.e. the additional layers do not make the overall transfer function of the filter more complex). For this paper, hyperbolic tangent non-linearities were used after each convolutional layer, except for the last layer, which had a linear activation applied (so that the output signal can take on a more linear range of values and have a uniform probability of occupying the range $[-1, 1]$).
 
 The pooling layers downsample the signals passing through the CNN. The model in Figure \ref{fig:cnn_model} has max-pooling layers and a downsampling rate of 2, which translates to only the maximum value between pairs of consecutive samples remaining. Ideally, the convolutional layers will amplify the samples related to Speaker 1's voice, and max-pooling will retain only those samples.
 
-The upsampling layers serve to undo the effects of the downsampling layers, so that the output signal has the same length as the input signal. The upsampling layers learn upsampling filters that best reconstruct Speaker 1's voice given the previous layers' outputs.
+The upsampling layers ensure that the output signal has the same length as the input signal. The upsampling layers learn upsampling filters that best reconstruct Speaker 1's voice given the previous layers' outputs.
 
 The loss used in the CNN was a combination of the RMSE between the CNN output and Speaker 1's true speech signal, and the RMSE between the DFTs of the CNN output and Speaker 1's true speech signal. This allowed for both the time and frequency components of the reconstructed speech signal to be evaluated, while still making the network loss easy to compute.
 
-The true power of a CNN is that, given an output error, the best updates to the filter weights in the network can be computed through backpropagation. Each layer in the CNN will is used to compute the output of the network, so the partial derivatives of each layer with respect to each other and the output can be computed. In this sense, the error at the output can be propagated backwards through the CNN to update the filter weights at each layer.
+The true power of a CNN is that, given an output error, the best updates to the filter weights in the network can be computed through backpropagation. Each layer in the CNN will is used to compute the output of the network, so the partial derivatives of each layer with respect to each other and the output can be computed. In this sense, the error at the output can be propagated backwards through the CNN to update the filter weights at each layer. This allows for the CNN to learn filters without any feedback from its designer. Instead of hand-tuning a variety of filters for each layer, these filters can be learned iteratively to minimize the reconstruction error.
 
 
 \section{Technical Approach and Results}
-All experimentation in this paper was done with Python 3.6. Python's librosa library was used for all audio processing, as it provides nice tools for loading, manipulating, and saving audio files.
+All experimentation in this paper was done with Python 3.6. Python's librosa library was used for all audio processing, as it provides useful tools for loading, manipulating, and saving audio files.
 
 \subsection{NMF}
 The NMF algorithm used in this paper was always used with no initializations for $W$ and $H$, a Frobenius norm objective, a maximum of 200 iterations, and with the number of components always set to two. The input audio signal was comprised of 32000 samples, and the spectrogram was computed using a segment size of 512, a DFT length of 512, an overlap of 128, and Kaiser window with $\beta = 14$.
@@ -357,7 +357,7 @@ A more typical reconstruction example is shown in Figure \ref{fig:diff_res}. In 
     \label{fig:diff_res}
 \end{figure}
 
-In general, the CNN produced much smoother and more realistic results. The CNN has three advantages over NMF: it can use nonlinear methods, it can use a variety of loss functions, and it can use a large amount of training examples to learn more robust reconstructions.
+The better performance of the CNN in the more realistic examples indicate the the CNN performs better in total reconstruction and . The CNN has three advantages over NMF: it can use nonlinear methods, it can use a variety of loss functions, and it can use a large amount of training examples to learn more robust reconstructions.
 
 The CNN applies nonlinear activations after each convolutional layer, which allows for nonlinear approximations to be made. Conversely, NMF relies on a linear matrix factorization, which places limitations on the reconstruction quality of Speaker 1's voice.
 
@@ -365,7 +365,7 @@ The CNN loss function for this experiment was a combination of the difference in
 
 Finally, the CNN is able to use the thousands of past examples it has seen to influence the reconstruction of future signals. The CNN can learn 
 common patterns or features in Speaker 1's voice and reconstruct them more easily as training time increases. NMF, on the other hand, does not keep track of any past examples, so only the current input is weighted for consideration. In other words, NMF cannot learn any patterns or features of Speaker 1's voice.
-
+s 
 
 
 

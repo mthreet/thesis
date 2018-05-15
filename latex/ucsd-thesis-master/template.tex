@@ -249,7 +249,7 @@ W \leftarrow W \circ \frac{AH'}{WHH'}
 H \leftarrow H \circ \frac{W'A}{W'WH'}
 \end{equation}
 
-where $A \circ B$ and $\frac{A}{B}$ represent elementwise multiplication and division respectively. With enough iterations, the Frobenius objective should converge to within a small threshold (with both the number of iterations and the threshold being tuneable hyperparameters).
+\noindent where $A \circ B$ and $\frac{A}{B}$ represent elementwise multiplication and division respectively. With enough iterations, the Frobenius objective should converge to within a small threshold (with both the number of iterations and the threshold being tuneable hyperparameters).
 
 NMF is useful due to its simple iterative implementation and because spectrogram magnitude matrices by definition satisfy the non-negative condition.  Additionally, the matrices $W$ and $H$ have useful signal interpretations. The columns of $W$ form $k$ frequency basis vectors for the spectrogram $A$, while the rows of $H$ act as time-varying activations for the frequency bases in $W$. The spectrograms of the $k$ independent signals are then estimated as:
 
@@ -257,7 +257,7 @@ NMF is useful due to its simple iterative implementation and because spectrogram
 X_i = W_{:i}H_{i:}, i=1,...,k
 \end{equation}
 
-where $W_{:i} $represents the the $i^{th}$ column of $W$, and $H_{i:} $represents the the $i^{th}$ row of $H$. In essence, each source is approximated as a basis spectrogram $X_i$ for the total spectrogram $A$. The original time-series speech signals are then recovered by multiplying each of the individual magnitude spectrograms $X_i$ with the phase of the spectrogram corresponding to $A$, and finding the inverse of the complex-valued spectrogram.
+\noindent where $W_{:i} $represents the the $i^{th}$ column of $W$, and $H_{i:} $represents the the $i^{th}$ row of $H$. In essence, each source is approximated as a basis spectrogram $X_i$ for the total spectrogram $A$. The original time-series speech signals are then recovered by multiplying each of the individual magnitude spectrograms $X_i$ with the phase of the spectrogram corresponding to $A$, and finding the inverse of the complex-valued spectrogram.
 
 \subsection{Convolutional Neural Networks}
 Convolutional Neural Networks generally use a combination of convolution, activation, and pooling layers to estimate a desired output signal given an input signal. CNNs will essentially learn a mapping from an input signal to an output signal, which for this paper were the mixed signal containing Speaker 1's voice and another voice, and Speaker 1's isolated voice, respectively. The benefit of a CNN is that the weights of all the convolutional filters do not need to be hand-designed. Instead, they are learned iteratively during a training process. Figure \ref{fig:cnn_model} shows the CNN used in this paper.
@@ -287,22 +287,92 @@ The true power of a CNN is that, given an output error, the best updates to the 
 All experimentation in this paper was done with Python 3.6. Python's librosa library was used for all audio processing, as it provides useful tools for loading, manipulating, and saving audio files.
 
 \subsection{NMF}
-The NMF algorithm used in this paper was always used with no initializations for $W$ and $H$, a Frobenius norm objective, a maximum of 200 iterations, and with the number of components always set to two. The input audio signal was comprised of 32000 samples, and the spectrogram was computed using a segment size of 512, a DFT length of 512, an overlap of 128, and Kaiser window with $\beta = 14$.
+The NMF algorithm used in this paper was always used with no initializations for $W$ and $H$, a Frobenius norm objective, a maximum of 200 iterations, and with the number of components always set to two. The input audio signal was comprised of 32000 samples, and the spectrogram was computed using a variety of segment sizes and windows (see Results), a DFT length equal to the segment size, and an overlap one-fourth the length of the segment size.
 
 The magnitude and phase of the resulting spectrogram were taken, and NMF was applied to the spectrogram magnitude with the parameters mentioned above. The resulting separated spectrogram magnitudes were then computed using the output of NMF, and the separated audio signals were obtained by taking the inverse spectrograms of the spectrogram magnitudes multiplied by the original spectrogram's phase.
 
 The RMSE between the estimate of Speaker 1's separated speech and Speaker 1's actual speech was then taken and recorded as the metric for reconstruction.
 
 \subsection{CNN}
-The architecture of the CNN in this paper is shown in Figure \ref{fig:cnn_model}. The filters in all convolutional layers had a kernel size of 16 and hyperbolic tangent activations applied, except for the final convolutional layer, which had a no activation (i.e. a linear activation) applied. Unlike the NMF processing, the input to the CNN was cut into segments of length 128, with no windowing applied. The CNN was trained on 2,000 example files, each with 32,000 samples. After training, the CNN was evaluated on 500 separate example files, each with 32,000 samples. The evaluation files were chosen randomly from the whole dataset so that a representative portion was obtained.
+The architecture of the CNN in this paper is shown in Figure \ref{fig:cnn_model}. The filters in all convolutional layers had a kernel size of 16 and hyperbolic tangent activations applied, except for the final convolutional layer, which had a no activation (i.e. a linear activation) applied. Unlike the NMF processing, the input to the CNN was cut into segments of length 128, with various windows applied (See the Results section). The CNN was trained on 2,000 example files, each with 32,000 samples. After training, the CNN was evaluated on 500 separate example files, each with 32,000 samples. The evaluation files were chosen randomly from the whole dataset so that a representative portion was obtained.
 
 
 \subsection{Results}
-Table \ref{table:results} shows a summary of the results  for NMF and the CNN. Note that all signals were normalized so that maximum value was one before the RMSE was taken.
+Tables \ref{table:results_win_none}-\ref{table:results_win_kaiser} show a summary of the results  for NMF and the CNN using a variety of window methods. Note that all signals for this case had a segment size of 256 and were normalized so that maximum value was one before the RMSE was taken.
 
 \vspace{0.25in}
 \begin{table}[!ht]
-\caption{Summary of reconstruction results (given in RMSE) at a variety of SNRs}
+\caption{Summary of reconstruction results (given in RMSE) using no window at a variety of SNRs}
+
+\vspace{-0.25in}
+\begin{center}
+\begin{tabular}{| c | c | c |  c | c | c |}
+
+\hline
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
+
+\hline
+NMF & 0.21 & 0.17 & 0.13 & 0.09 & 0.07 \\
+
+\hline
+CNN & 0.13 & 0.09 & 0.06 & 0.03 & 0.01 \\
+
+\hline
+\end{tabular}
+\end{center}
+\label{table:results_win_none}
+\end{table}
+
+\vspace{0.25in}
+\begin{table}[!ht]
+\caption{Summary of reconstruction results (given in RMSE) using a Hamming window at a variety of SNRs}
+
+\vspace{-0.25in}
+\begin{center}
+\begin{tabular}{| c | c | c |  c | c | c |}
+
+\hline
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
+
+\hline
+NMF & 0.19 & 0.16 & 0.11 & 0.07 & 0.05 \\
+
+\hline
+CNN & 0.12 & 0.09 & 0.05 & 0.03 & 0.01 \\
+
+\hline
+\end{tabular}
+\end{center}
+\label{table:results_win_hamming}
+\end{table}
+
+\vspace{0.25in}
+\begin{table}[!ht]
+\caption{Summary of reconstruction results (given in RMSE) using a Blackman-Harris window at a variety of SNRs}
+
+
+\vspace{-0.25in}
+\begin{center}
+\begin{tabular}{| c | c | c |  c | c | c |}
+
+\hline
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
+
+\hline
+NMF & 0.17 & 0.14 & 0.10 & 0.07 & 0.04 \\
+
+\hline
+CNN & 0.13 & 0.09 & 0.07 & 0.04 & 0.02 \\
+
+\hline
+\end{tabular}
+\end{center}
+\label{table:results_win_blackharr}
+\end{table}
+
+\vspace{0.25in}
+\begin{table}[!ht]
+\caption{Summary of reconstruction results (given in RMSE) using a Kaiser window ($\beta=16$) at a variety of SNRs}
 
 \vspace{-0.25in}
 \begin{center}
@@ -320,14 +390,111 @@ CNN & 0.13 & 0.09 & 0.06 & 0.03 & 0.01 \\
 \hline
 \end{tabular}
 \end{center}
-\label{table:results}
+\label{table:results_win_kaiser}
 \end{table}
 
+Tables \ref{table:results_seg_128}-\ref{table:results_seg_1024} contain results for NMF and the CNN using a variety of segment lengths. Note that all signals were windowed with a Kaiser window ($\beta=16$) prior to the algorithms being applied.
+
+\vspace{0.25in}
+\begin{table}[!ht]
+\caption{Summary of reconstruction results (given in RMSE) using a segment size of 128 at a variety of SNRs}
+
+\vspace{-0.25in}
+\begin{center}
+\begin{tabular}{| c | c | c |  c | c | c |}
+
+\hline
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
+
+\hline
+NMF & 0.20 & 0.18 & 0.15 & 0.11 & 0.09 \\
+
+\hline
+CNN & 0.14 & 0.11 & 0.08 & 0.05 & 0.03 \\
+
+\hline
+\end{tabular}
+\end{center}
+\label{table:results_seg_128}
+\end{table}
+
+\vspace{0.25in}
+\begin{table}[!ht]
+\caption{Summary of reconstruction results (given in RMSE) using a segment size of 256 at a variety of SNRs}
+
+\vspace{-0.25in}
+\begin{center}
+\begin{tabular}{| c | c | c |  c | c | c |}
+
+\hline
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
+
+\hline
+NMF & 0.15 & 0.12 & 0.10 & 0.08 & 0.04 \\
+
+\hline
+CNN & 0.13 & 0.09 & 0.06 & 0.03 & 0.01 \\
+
+\hline
+\end{tabular}
+\end{center}
+\label{table:results_seg_256}
+\end{table}
+
+\vspace{0.25in}
+\begin{table}[!ht]
+\caption{Summary of reconstruction results (given in RMSE) using a segment size of 256 at a variety of SNRs}
+
+\vspace{-0.25in}
+\begin{center}
+\begin{tabular}{| c | c | c |  c | c | c |}
+
+\hline
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
+
+\hline
+NMF & 0.14 & 0.13 & 0.08 & 0.06 & 0.03 \\
+
+\hline
+CNN & 0.11 & 0.08 & 0.06 & 0.03 & 0.01 \\
+
+\hline
+\end{tabular}
+\end{center}
+\label{table:results_seg_512}
+\end{table}
+
+\vspace{0.25in}
+\begin{table}[!ht]
+\caption{Summary of reconstruction results (given in RMSE) using a segment size of 256 at a variety of SNRs}
+
+\vspace{-0.25in}
+\begin{center}
+\begin{tabular}{| c | c | c |  c | c | c |}
+
+\hline
+Method & -6 dB & -3 dB & 0 dB & 3 dB & 6dB \\
+
+\hline
+NMF & 0.13 & 0.11 & 0.08 & 0.05 & 0.03 \\
+
+\hline
+CNN & 0.10 & 0.07 & 0.06 & 0.03 & 0.01 \\
+
+\hline
+\end{tabular}
+\end{center}
+\label{table:results_seg_1024}
+\end{table}
 
 \section{Conclusion}
-As seen in Table \ref{table:results}, the CNN performs better at all SNRs. Both the NMF algorithm and the CNN perform better as the SNR increases, which makes sense due to both methods having to do less work to transform the input mixed signal into the separated signal. While Table \ref{table:results} shows that the two methods are not too far off in their reconstruction errors, the graphical results reveal a different result.
+As seen in Tables \ref{table:results_win_none}-\ref{table:results_seg_1024}, the CNN performs better in all scenarios at all SNRs. Both the NMF algorithm and the CNN perform better as the SNR increases, which makes sense due to both methods having to do less work to transform the input mixed signal into the separated signal. While NMF is greatly affected by window choice and segment size, the CNN results remained relatively consistent. The largest discrepancies in the RMSE results for the CNN were at the lower SNRs, with the higher SNR results not seeing much difference.
 
-Figure \ref{fig:sim_res} shows a reconstruction example where both NMF and the CNN perform decently well at reconstruction. While neither method is perfect, and both methods tend to look more like the mixed signal in areas of uncertainty, the output is generally smooth and natural.
+The CNN's resilience to window type is most likely because it operates on the raw audio input, and not the spectrogram of the input like NMF. Windowing is largely done to limit distortion in a Short-Time Fourier Transform due to the truncation of a signal, so its use on a raw audio processing algorithm is not as useful.
+
+The CNN's resilience to segment size is due to its convolutional nature. While the input and output segment sizes change, the kernel sizes of the CNN's filters do not. Because the kernel sizes remain the same, the results will not differ drastically between inputs of different segment sizes. NMF, on the other hand, relies on the segment size to compute the spectrogram of the input signal. For NMF, changing the segment sizes changes how much ``information'' is in each time-indexed DFT, which leads to a larger change in reconstruction RMSE.
+
+While the tables in the Results section show that the two methods are not too far off in their reconstruction errors, the graphical results reveal a different result. Figure \ref{fig:sim_res} shows a reconstruction example where both NMF and the CNN perform decently well at reconstruction. While neither method is perfect, and both methods tend to look more like the mixed signal in areas of uncertainty, the output is generally smooth and natural.
 
 \begin{figure}[h]
     \begin{minipage}{.5\linewidth}

@@ -1464,7 +1464,7 @@ on microfilm and electronically: }}\\
 % TABLE
 %
 \newcounter{table}[section]%[chapter]
-\def\thetable{\thesection.\@arabic\c@figure}%{\thechapter.\@arabic\c@table}
+\def\thetable{\thesection.\@arabic\c@table}%{\thechapter.\@arabic\c@table}
 
 \def\fps@table{tbp}
 \def\ftype@table{2}

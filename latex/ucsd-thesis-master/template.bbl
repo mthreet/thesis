@@ -1,4 +1,19 @@
-\begin{thebibliography}{LS00}
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{HDY{\etalchar{+}}12}
+
+\bibitem[HDY{\etalchar{+}}12]{6296526}
+G.~Hinton, L.~Deng, D.~Yu, G.~E. Dahl, A.~r.~Mohamed, N.~Jaitly, A.~Senior,
+  V.~Vanhoucke, P.~Nguyen, T.~N. Sainath, and B.~Kingsbury.
+\newblock Deep neural networks for acoustic modeling in speech recognition: The
+  shared views of four research groups.
+\newblock {\em IEEE Signal Processing Magazine}, 29(6):82--97, Nov 2012.
+
+\bibitem[KSH12]{NIPS2012_4824}
+Alex Krizhevsky, Ilya Sutskever, and Geoffrey~E Hinton.
+\newblock Imagenet classification with deep convolutional neural networks.
+\newblock In F.~Pereira, C.~J.~C. Burges, L.~Bottou, and K.~Q. Weinberger,
+  editors, {\em Advances in Neural Information Processing Systems 25}, pages
+  1097--1105. Curran Associates, Inc., 2012.
 
 \bibitem[las06]{laslab}
 Ikerbasque and university of the basque country language and speech lab's
@@ -9,5 +24,24 @@ Ikerbasque and university of the basque country language and speech lab's
 Daniel~D. Lee and H.~Sebastian Seung.
 \newblock Algorithms for non-negative matrix factorization.
 \newblock In {\em In NIPS}, pages 556--562. MIT Press, 2000.
+
+\bibitem[Row01]{roweis2001one}
+Sam~T Roweis.
+\newblock One microphone source separation.
+\newblock In {\em Advances in neural information processing systems}, pages
+  793--799, 2001.
+
+\bibitem[SO06]{Schmidt_Olsson_2006}
+Mikkel~N. Schmidt and Rasmus~K. Olsson.
+\newblock Single-channel speech separation using sparse non-negative matrix
+  factorization.
+\newblock In {\em INTERSPEECH}, pages 2614--2617, 2006.
+
+\bibitem[Vir07]{Virtanen_2007}
+Tuomas Virtanen.
+\newblock Monaural sound source separation by nonnegative matrix factorization
+  with temporal continuity and sparseness criteria.
+\newblock {\em IEEE Transactions on Audio, Speech, and Language Processing},
+  15(3):1066--1074, 2007.
 
 \end{thebibliography}

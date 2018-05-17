@@ -262,7 +262,7 @@ X_i = W_{:i}H_{i:}, i=1,...,k
 The use of NMF for speech separation is a well-established field \cite{Schmidt_Olsson_2006}\cite{Virtanen_2007}. Both citations demonstrate that NMF can produce accurate representations of separated speech signals, with applications in both speech separation and speech recognition. \cite{Virtanen_2007} shows that a sparsity constraint on the NMF does not lead to significant improvements in performance, so sparsity will not be considered for this paper.
 
 \subsection{Convolutional Neural Networks}
-While Convolutional Neural Networks are more commonly used for image and higher dimensional applications \cite{NIPS2012_4824}, there is no reason t that they cannot work well for signals in one dimension. In fact, neural networks have already been used for acoustic modeling and recognition\cite{6296526}, so an extension to speech separation is not too different or impractical.
+While Convolutional Neural Networks are more commonly used for image and higher dimensional applications \cite{NIPS2012_4824}, there is no reason that they cannot work well for signals in one dimension. In fact, neural networks have already been used for acoustic modeling and recognition\cite{6296526}, so an extension to speech separation is not too different or impractical.
 
 Convolutional Neural Networks generally use a combination of convolution, activation, and pooling layers to estimate a desired output signal given an input signal. CNNs will essentially learn a mapping from an input signal to an output signal, which for this paper were the mixed signal containing Speaker 1's voice and another voice, and Speaker 1's isolated voice, respectively. The benefit of a CNN is that the weights of all the convolutional filters do not need to be hand-designed. Instead, they are learned iteratively during a training process. Figure \ref{fig:cnn_model} shows the CNN used in this paper.
 
@@ -447,7 +447,7 @@ CNN & 0.13 & 0.09 & 0.06 & 0.03 & 0.01 \\
 
 \vspace{0.25in}
 \begin{table}[!ht]
-\caption{Summary of reconstruction results (given in RMSE) using a segment size of 256 at a variety of SNRs}
+\caption{Summary of reconstruction results (given in RMSE) using a segment size of 512 at a variety of SNRs}
 
 \vspace{-0.25in}
 \begin{center}
@@ -470,7 +470,7 @@ CNN & 0.11 & 0.08 & 0.06 & 0.03 & 0.01 \\
 
 \vspace{0.25in}
 \begin{table}[!ht]
-\caption{Summary of reconstruction results (given in RMSE) using a segment size of 256 at a variety of SNRs}
+\caption{Summary of reconstruction results (given in RMSE) using a segment size of 1024 at a variety of SNRs}
 
 \vspace{-0.25in}
 \begin{center}

@@ -203,7 +203,7 @@
 %%%
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ucsd}[2010/06/01 V3.7 University of California, San Diego, Dissertation Class]
+\ProvidesClass{ucsd}[2010/06/01 V3.7 University of California San Diego, Dissertation Class]
 
 
 %    ****************************************
@@ -474,12 +474,12 @@
     \null\vfil
   \begin{center}
     \fmfont
-    UNIVERSITY OF CALIFORNIA, {\expandafter\uppercase\expandafter{\@campus}}\par
+    UNIVERSITY OF CALIFORNIA {\expandafter\uppercase\expandafter{\@campus}}\par
     \bigskip \medskip
     {\bfseries
      {\@title} \par}
     \bigskip \medskip
-    A dissertation submitted in partial satisfaction of the \par
+    A thesis submitted in partial satisfaction of the \par
 	\smallskip
     requirements for the degree \par
 	\smallskip
@@ -548,7 +548,7 @@ All rights reserved.}
 \begin{center}
 \vspace{.25in}
 \vspace{\@approvalspace}
-\makebox[4in][l]{\parbox{4in}{\fmfont The dissertation of {\@author}
+\makebox[4in][l]{\parbox{4in}{\fmfont The thesis of {\@author}
 is approved, and it is acceptable in quality and form for publication
 on microfilm and electronically: }}\\
 \begin{tabular*}{4in}[t]{r@{\extracolsep{\fill}}r}
@@ -593,7 +593,7 @@ on microfilm and electronically: }}\\
 
 & \UCSD@text@chair
 \end{tabular*}\\[\@approvalspace]
-{\fmfont University of California, {\@campus}} \\
+{\fmfont University of California {\@campus}} \\
 \vspace{-.25in}
 \vspace{\@approvalspace}
 {\fmfont \@degreeyear}
@@ -720,7 +720,7 @@ on microfilm and electronically: }}\\
   \fi
   \par
   \vspace{.3in}
-  University of California, {\@campus}, \@degreeyear \par
+  University of California {\@campus}, \@degreeyear \par
   \vspace{.3in}
   {\UCSD@chair}, \UCSD@text@chair
   %Check if there is a co-chair and add accordingly.
@@ -1102,7 +1102,7 @@ on microfilm and electronically: }}\\
 \def\l@part#1#2{\addpenalty{-\@highpenalty}%
    \addvspace{2.25em plus\p@}% space above part line
    \begingroup
-   \@tempdima 3em         % width of box holding part number, used by
+   \@tempdima 0em         % width of box holding part number, used by
      \parindent \z@ \rightskip \@pnumwidth             %% \numberline
      \parfillskip -\@pnumwidth
      {\large \bfseries          % set line in \large boldface
@@ -1134,19 +1134,19 @@ on microfilm and electronically: }}\\
 %   \endgroup}
 
 \newlength{\@chapterlength} % Original Magic Value - RMR
-\setlength{\@chapterlength}{1.5em} % This code adds space for \@chapapp for toc entries
+\setlength{\@chapterlength}{0em} % This code adds space for \@chapapp for toc entries
 \ifnum \@chapterheadsmark = 1
 \settowidth{\@chapterlength}{\@chapapp}
-\addtolength{\@chapterlength}{2.6em} % Space between toc labels and values
+\addtolength{\@chapterlength}{0em} % Space between toc labels and values
 \fi
 
-\def\l@chapter{\normalfont\pagebreak[3]\vskip 1em plus 1pt \@dottedtocline{0}{0em}{\@chapterlength}}
+\def\l@chapter{\normalfont\@dottedtocline{0}{0em}{\@chapterlength}}
 
 \newlength{\UCSD@toc@frontmatterLength}
 \setlength{\UCSD@toc@frontmatterLength}{0em}
 % Use the following line to have the front matter title aligned with
 % the chapter titles.  Otherwise they will aligned to the left (as required by OGS.)
-%\setlength{\UCSD@toc@frontmatterLength}{0em}
+\setlength{\UCSD@toc@frontmatterLength}{0em}
 \def\l@frontmatter{\normalfont\vskip 1em plus 1pt \@dottedtocline{0}{0em}{\UCSD@toc@frontmatterLength}}
 
 
@@ -1154,21 +1154,20 @@ on microfilm and electronically: }}\\
 \setlength{\UCSD@toc@backmatterLength}{0em}
 % Use the following line to have the back matter title aligned with
 % the chapter titles.  Otherwise they will aligned to the left (as required by OGS.)
-%\setlength{\UCSD@toc@backmatterLength}{0em}
+\setlength{\UCSD@toc@backmatterLength}{0em}
 \def\l@backmatter{\normalfont\vskip 1em plus 1pt \@dottedtocline{0}{0em}{\UCSD@toc@frontmatterLength}}
 
-
-\def\l@section{\normalfont\@dottedtocline{1}{\@chapterlength}{2.3em}}
+\def\l@section{\addvspace{1em plus1pt}\normalfont\@dottedtocline{0}{0em}{1em}}
 
 \newlength{\@subsectionlength}
 \setlength{\@subsectionlength}{\@chapterlength}
 \addtolength{\@subsectionlength}{2.3em}
-\def\l@subsection{\normalfont\@dottedtocline{2}{\@subsectionlength}{3.2em}}
+\def\l@subsection{\addvspace{1em plus 1pt}\normalfont\@dottedtocline{1}{2.3em}{2em}}
 
 \newlength{\@subsubsectionlength}
 \setlength{\@subsubsectionlength}{\@chapterlength}
 \addtolength{\@subsubsectionlength}{5.5em}
-\def\l@subsubsection{\normalfont\@dottedtocline{3}{\@subsubsectionlength}{4.1em}}
+\def\l@subsubsection{\addvspace{1em plus 1pt}\normalfont\@dottedtocline{2}{3.23m}{4.1em}}
 
 \newlength{\@paragraphlength}
 \setlength{\@paragraphlength}{\@chapterlength}
@@ -1205,7 +1204,7 @@ on microfilm and electronically: }}\\
 \settowidth{\@figurelength}{\figurename }
 % Magic value, but consistent with the standard figure length
 \addtolength{\@figurelength}{2.8em}
-\def\l@figure{\normalfont\@dottedtocline{1}{0em}{\@figurelength}}
+\def\l@figure{\addvspace{1em plus 1pt}\normalfont\@dottedtocline{1}{0em}{\@figurelength}}
 
 % LIST OF TABLES
 %
@@ -1231,7 +1230,7 @@ on microfilm and electronically: }}\\
 \settowidth{\@tablelength}{\tablename }
 % Magic value, but consistent with the standard table length.
 \addtolength{\@tablelength}{2.8em}
-\def\l@table{\normalfont\@dottedtocline{1}{0em}{\@tablelength}}
+\def\l@table{\addvspace{1em plus 1pt}\normalfont\@dottedtocline{1}{0em}{\@tablelength}}
 
 
 %    ****************************************

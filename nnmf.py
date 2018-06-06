@@ -2,7 +2,7 @@ from utils import load_dataset, plot_audio, make_spectrograms, plot_spects, \
     nnmf, spect_to_audio, plot_orig_vs_recon, compute_recon_scores, save_wavs
 
 in_dir = '/home/mthret/class/thesis/data/mf'
-save_dir = '/home/mthret/class/thesis/results/nnmf/plots'
+save_dir = './new_res/nmf'
 sr = 16000
 speaker_ids = ['8', '16']
 num_wavs = 50
